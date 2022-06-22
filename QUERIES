@@ -1,0 +1,761 @@
+1. List the departments which does not have empyloyee at all.
+select dname from dept where deptno not in (select deptno from emp);
+DNAME
+--------------
+OPERATIONS
+2.Display all the employees whose job is same as scott.
+ SELECT * FROM EMP WHERE JOB = (SELECT JOB FROM EMP WHERE ENAME='SCOTT');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+3.Display scott's manager's manager'S department name.
+SELECT DNAME FROM DEPT WHERE DEPTNO IN(SELECT DEPTNO FROM EMP WHERE EMPNO IN( SELECT MGR
+  2     FROM EMP WHERE EMPNO IN(SELECT MGR FROM EMP WHERE ENAME='SCOTT')));
+DNAME
+--------------
+ACCOUNTING
+4.List employess whose job is same as scott and their salary greater than smith's salary.
+SELECT * FROM EMP WHERE JOB =(SELECT JOB FROM EMP WHERE ENAME='SCOTT') AND SAL >(SELECT SAL FROM EMP WHERE ENAME='SMITH');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+5.Display all the employees whose job is same as scott and allen.
+ SELECT * FROM EMP WHERE JOB IN (SELECT JOB FROM EMP WHERE ENAME IN('SCOTT','ALLEN'));
+ EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+6.Display all employees who are actual managers.
+ select * from emp where empno in(select mgr from emp);
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+7.Display who are all employees reporting to scott.
+select * from emp where mgr=(select empno from emp where ename='SCOTT');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+8.Select 2nd maximum salary.
+ SELECT MAX(SAL) FROM EMP WHERE SAL<(SELECT MAX(SAL) FROM EMP);
+  MAX(SAL)
+----------
+      3000
+
+
+9. select 3rd maximum salary.
+  SELECT MAX(SAL) FROM EMP WHERE SAL<(SELECT MAX(SAL) FROM EMP WHERE SAL<(SELECT MAX(SAL) FROM EMP));
+  MAX(SAL)
+----------
+      2975
+10.Display all the employees who earn more than all the managers(job).
+select * from emp where sal> all (select sal from emp where job='MANAGER');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+11.Display all the employees who earn more than any the managers(job).
+ select * from emp where sal> any (select sal from emp where job='MANAGER');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+12.Display empno,job and salary of all the analyst who are earning more than any of the manager
+ select empno,job,sal from emp where job='ANALYST' and sal>any(select sal from emp where job='MANAGER');
+     EMPNO JOB              SAL
+---------- --------- ----------
+      7902 ANALYST         3000
+      7788 ANALYST         3000
+13.select the department name and location of all employees working for clark
+select dname,loc from dept where deptno in(select deptno from emp where mgr in(select empno from emp where ename='CLARK'));
+DNAME          LOC
+-------------- -------------
+ACCOUNTING     NEW YORK
+14. select all the employees working in dallas.
+ select * from emp where deptno in(select deptno from dept where loc='DALLAS')
+
+ EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+------ ---------- --------- ---------- --------- ---------- ---------- ----------
+  7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+  7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+  7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+  7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+  7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+15.Display all the employees whose salary is greater than average salary of deartment 20.
+select * from emp where sal>(select avg(sal) from emp where deptno=20);
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+
+16.select all the employees who gets maximum salary.
+ select * from emp where sal=(select max(sal) from emp);
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+17.Display first employee record based on hiredate.
+ select * from emp where hiredate=(select min(hiredate) from emp);
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+18.list the employees who have salary greater than Allen.
+    select * from emp where sal >(select sal from emp where ename='ALLEN');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+19.list the daprtment names which are having analysts.
+ select dname from dept where deptno in(select deptno from emp where job ='ANALYST')
+DNAME
+--------------
+RESEARCH
+20.List the department names which have salesman in it.
+ select dname from dept where deptno in(select deptno from emp where job='SALESMAN')
+DNAME
+--------------
+SALES
+21.Display the employees whose location which has atleast one o in it.
+select * from emp where deptno in (select deptno from dept where loc like '%O%');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+
+22.List the department names that are having at least one employee in it.
+ select dname from dept where deptno in (select deptno from emp group by deptno having count(*)>=1)
+DNAME
+--------------
+SALES
+RESEARCH
+ACCOUNTING
+23.list the department names having atleast 4 employees in it.
+ select dname from dept where deptno in (select deptno from emp group by deptno having count(*)>=4);
+DNAME
+--------------
+SALES
+RESEARCH
+24.Display the department names which are having at least 2 Clerks in it.
+select dname from dept where deptno in(select deptno from emp where job='CLERK' group by deptno having count(*) >=2);
+DNAME
+--------------
+RESEARCH
+25.Query to display the employee names who is having maximum salary in Dept Name "Accounting"
+SELECT ENAME FROM EMP WHERE SAL = (SELECT MAX(SAL) FROM EMP WHERE DEPTNO =(SELECT DEPTNO FROM DEPT WHERE DNAME='ACCOUNTING')) ;
+ENAME
+----------
+KING
+26. Query to display the Dept Name who is having Highest Commission
+ SELECT DNAME FROM DEPT WHERE DEPTNO = (SELECT DEPTNO FROM EMP WHERE COMM =(SELECT MAX(COMM) FROM EMP));
+DNAME
+--------------
+SALES
+27. Query to display all the employees whose Dept Number is same as Scott.
+ SELECT * FROM EMP WHERE DEPTNO = ( SELECT DEPTNO FROM EMP WHERE ENAME = 'SCOTT');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+                 
+28.Display all the employees in 'Operations and Accounting' Dept. list the employees who has salary greater than miller
+ SELECT * FROM EMP WHERE DEPTNO IN ( SELECT DEPTNO FROM DEPT WHERE DNAME IN ( 'OPERATIONS','ACCOUNTING')) AND
+ SAL > ( SELECT SAL FROM EMP WHERE ENAME ='MILLER');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+                 
+29. List department name having atleast 3 salesman
+ SELECT DNAME FROM DEPT WHERE DEPTNO IN( SELECT DEPTNO FROM EMP WHERE JOB='SALESMAN' GROUP BY DE
+PTNO HAVING COUNT(*)>=3);
+DNAME
+--------------
+SALES
+30.Display all employess who do not have any reporter.
+select * from emp where mgr is null;
+king
+
+31. display all the employees who are not managers.
+SELECT * FROM EMP WHERE EMPNO NOT IN ( SELECT MGR FROM EMP WHERE MGR IS NOT NULL);
+ EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+------ ---------- --------- ---------- --------- ---------- ---------- ----------
+  7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+  7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+  7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+  7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+  7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+  7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+  7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+  7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+ 
+ 31.List all the employees who are reporting to jones manager
+  SELECT * FROM EMP WHERE empno =(SELECT mgr FROM EMP WHERE ENAME ='JONES');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+                 
+32. list employees from research&accounting having atleast 2 reporting.
+SELECT * FROM EMP WHERE DEPTNO IN( SELECT DEPTNO FROM DEPT WHERE DNAME IN ('RESEARCH','ACCOUNTING'))
+AND EMPNO IN ( SELECT MGR FROM EMP GROUP BY MGR HAVING COUNT(*)>=2);
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+33. Display the departname of the employee whose name  starts with S and salary between 1500 to 3000.
+ SELECT DNAME FROM DEPT WHERE DEPTNO IN ( SELECT DEPTNO FROM EMP WHERE ENAME LIKE 'S%' AND SAL BETWEEN 1500 AND 3000);
+
+DNAME
+--------------
+RESEARCH
+34.Display location of employee whose salary is minimum salary but salary is greater than 2000
+SELECT LOC FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP WHERE SAL IN( SELECT MIN(SAL) FROM
+ EMP WHERE SAL>2000));
+LOC
+-------------
+NEW YORK
+35.Display the location of an employee in accounting department.
+ SELECT LOC FROM DEPT WHERE DEPTNO = (SELECT DEPTNO FROM DEPT WHERE DNAME='ACCOUNTING');
+LOC
+-------------
+NEW YORK
+36.Display the department location that are having greater than four employees in it.
+ SELECT LOC FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP GROUP BY DEPTNO HAVING COUNT(*)>4);
+LOC
+-------------
+CHICAGO
+DALLAS
+37.Write a query to display all the employee whose job not same as Allen and salary is greater than Martin.
+select * from emp where Job !=(select job from emp where ename='ALLEN') AND SAL >(SELECT SAL FROM EMP WHERE ENAME='MARTIN');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+38.Display all the employees who is having location same as Adam's manager.
+SELECT * FROM EMP WHERE DEPTNO =(SELECT DEPTNO FROM DEPT WHERE LOC =(SELECT LOC FROM DEPT WHERE
+ DEPTNO =(SELECT DEPTNO FROM EMP WHERE EMPNO = (SELECT MGR FROM EMP WHERE ENAME='ADAMS'))));
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+                 
+39. Display the job, manager of employees who is working for Jones
+SELECT JOB, ENAME,MGR FROM EMP WHERE MGR =(SELECT EMPNO FROM EMP WHERE ENAME='JONES');
+JOB       ENAME             MGR
+--------- ---------- ----------
+ANALYST   SCOTT            7566
+ANALYST   FORD             7566
+40. Display the employee names, higher date, commission of Ford's manager
+ SELECT ENAME ,HIREDATE ,COMM FROM EMP WHERE EMPNO =(SELECT MGR FROM EMP WHERE ENAME = 'FORD');
+ENAME      HIREDATE        COMM
+---------- --------- ----------
+JONES      02-APR-81
+
+41.Display the number of employees who are getting salary less then Blake's MANAGER salary.
+  SELECT COUNT(ENAME) FROM EMP WHERE SAL<(SELECT SAL FROM EMP WHERE EMPNO=(SELECT MGR FROM EMP WHERE ENAME='BLAKE'));
+  COUNT(ENAME)
+  ----------
+      13
+42.List the employess who are located in chicago and their commission is zero.
+   SELECT COUNT(*) FROM EMP WHERE COMM=0 AND DEPTNO IN (SELECT DEPTNO FROM DEPT WHERE LOC='CHICAGO');
+   COUNT(*)
+   --------
+       1
+43.List employees who work for sales department and their salary greater than average salary of their department.
+  SELECT * FROM EMP WHERE DEPTNO = (SELECT DEPTNO FROM DEPT WHERE DNAME='SALES') AND SAL > ANY (SELECT 
+  AVG(SAL) FROM EMP GROUP BY DEPTNO);
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+     ------ ---------- --------- ---------- --------- ---------- ---------- ----------
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+
+44.List employees who are working in research department and they are manager.
+   SELECT ENAME FROM EMP WHERE DEPTNO =(SELECT DEPTNO FROM DEPT WHERE DNAME='RESEARCH') AND EMPNO IN (SELECT MGR FROM EMP);
+ENAME
+-------
+JONES
+SCOTT
+FORD
+45. Display department name of the employees who earn commission.
+   SELECT DNAME FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP WHERE COMM IS NOT NULL);
+DNAME
+--------
+SALES
+46.Display department name of the employee who earn maximum salary and have no reporting manager.
+ SELECT DNAME FROM DEPT WHERE DEPTNO IN ( SELECT DEPTNO FROM EMP WHERE MGR IS NULL AND SAL=(SELECT MAX(SAL) FROM EMP));
+DNAME
+--------------
+ACCOUNTING
+47.Display employee details who are reporting to blake and have commission without using null or not null.
+ SELECT * FROM EMP WHERE MGR IN (SELECT EMPNO FROM EMP WHERE ENAME='BLAKE') AND COMM IS NOT NULL;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+                 
+48.List all the deprtnaments and loc of all the salesman's manager's manager.
+   SELECT DNAME ,LOC FROM DEPT WHERE DEPTNO IN(SELECT DEPTNO FROM EMP WHERE EMPNO IN( SELECT MGR
+   FROM EMP WHERE EMPNO IN(SELECT MGR FROM EMP WHERE JOB='SALESMAN')));
+DNAME          LOC
+-------------- -------------
+ACCOUNTING     NEW YORK
+49.List the employee deptname and loc of all the employees who are clerk ,reporting to blake and salary is lesser than martin salary
+   SELECT DNAME ,LOC FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP WHERE JOB='CLERK' AND MGR IN (SELECT EMPNO FROM EMP WHERE ENAME='BLAKE' )
+   AND  SAL<(SELECT SAL FROM EMP WHERE ENAME='MARTIN'));
+   DNAME          LOC
+-------------- -------------
+SALES          CHICAGO
+50.List the employees who does not directly report to president,have commission and salary more than max salary of all the clerk without
+using null or not null.
+   SELECT ENAME FROM EMP WHERE MGR != (SELECT EMPNO FROM EMP WHERE JOB='PRESIDENT') AND COMM Is NOT NULL
+  AND SAL> ALL(SELECT MAX(SAL) FROM EMP WHERE JOB='CLERK' );
+   no rows selected
+  
+ 51. List the employees who joined after 2 years of first employee of the company and more than blake salary.
+     SELECT * FROM EMP WHERE HIREDATE>ALL(SELECT MIN(HIREDATE)+(365*2) FROM EMP) AND SAL>(SELECT SAL FROM EMP WHERE ENAME='BLAKE');
+ EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+------ ---------- --------- ---------- --------- ---------- ---------- ----------
+  7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+ 
+ 52. Display location of all the employees who are reporting to Blake.
+   SELECT LOC FROM DEPT WHERE DEPTNO IN( SELECT DEPTNO FROM EMP WHERE MGR =(SELECT EMPNO FROM EMP WHERE ENAME='BLAKE'));
+LOC
+-------------
+CHICAGO
+53. List all the employees whose job is same as jones and their salary lesser than scott.
+  SELECT * FROM EMP WHERE JOB=(SELECT JOB FROM EMP WHERE ENAME='JONES') AND SAL<(SELECT SAL FROM  EMP WHERE ENAME='SCOTT');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+ 54. Display the king's first year salary and his location with department.
+   SELECT SAL*12  AS fIRST_YEAR_SAL,DNAME,LOC FROM EMP,DEPT WHERE EMP.DEPTNO=DEPT.DEPTNO AND ENAME='KING';
+FIRST_YEAR_SAL DNAME          LOC
+-------------- -------------- -------------
+         60000 ACCOUNTING     NEW YORK
+55. Display all the employees of department 30, 20 with their anual salary and having atleast 3 employees.
+  SELECT SAL*12 AS ANUAL_SAL, ENAME FROM EMP WHERE DEPTNO IN(20,30) AND DEPTNO IN (SELECT DEPTNO FROM EMP GROUP BY DEPTNO HAVING COUNT(*)>=3);
+ ANUAL_SAL ENAME
+---------- ----------
+     11400 JAMES
+     18000 TURNER
+     34200 BLAKE
+     15000 MARTIN
+     15000 WARD
+     19200 ALLEN
+     36000 FORD
+     13200 ADAMS
+     36000 SCOTT
+     35700 JONES
+      9600 SMITH
+56. Display department name which is having second highest average salary and third highest induvidul salary.
+
+57. Display all the employees who are earning less than any of the salesman.
+ SELECT * FROM EMP WHERE SAL < ANY(SELECT SAL FROM EMP WHERE JOB='SALESMAN');
+EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+----- ---------- --------- ---------- --------- ---------- ---------- ----------
+ 7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+ 7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+ 7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+ 7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+ 7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+ 7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+ 7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+58.Display all the employees who are joined before the last person
+  SELECT * FROM EMP WHERE HIREDATE < (SELECT MAX(HIREDATE) FROM EMP);
+EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+----- ---------- --------- ---------- --------- ---------- ---------- ----------
+ 7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+ 7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+ 7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+ 7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+ 7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+ 7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+ 7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+ 7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+ 7839 KING       PRESIDENT            17-NOV-81       5000                    10
+ 7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+ 7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+ 7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+ 7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+59.Display last but one employee record
+sELECT * FROM EMP WHERE HIREDATE =(SELECT MAX(HIREDATE FROM EMP WHERE HIREDATE<(SELECT MAX(HIREDATE) FROM EMP));
+ sELECT * FROM EMP WHERE HIREDATE =(SELECT MAX(HIREDATE) FROM EMP WHERE HIREDATE<(SELECT MAX(HIR
+EDATE) FROM EMP))
+ 
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM
+---------- ---------- --------- ---------- --------- ---------- ----------
+    DEPTNO
+----------
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000
+        20
+60.Find third minimum salary in the employee table
+SELECT MIN(SAL) FROM EMP WHERE SAL > (SELECT MIN(SAL) FROM EMP WHERE SAL > (SELECT MIN(SAL) FROM EMP));
+MIN(SAL)
+--------
+    1100
+               
+61.Display all the employees who are earning more than any of the manager.
+ 
+  select * from emp where sal > ANY (select sal from emp where job ='MANAGER');
+EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+----- ---------- --------- ---------- --------- ---------- ---------- ----------
+ 7839 KING       PRESIDENT            17-NOV-81       5000                    10
+ 7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+ 7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+ 7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+ 7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+SQL> select * from emp where sal > ANY (select sal FROM EMP WHERE EMPNO IN (SELECT MGR FROM EMP));
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM
+---------- ---------- --------- ---------- --------- ---------- ----------
+    DEPTNO
+----------
+      7839 KING       PRESIDENT            17-NOV-81       5000
+        10
+      7902 FORD       ANALYST         7566 03-DEC-81       3000
+        20
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000
+        20
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM
+---------- ---------- --------- ---------- --------- ---------- ----------
+    DEPTNO
+----------
+      7566 JONES      MANAGER         7839 02-APR-81       2975
+        20
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850
+        30
+ 62. List employees who joined after 4 years of 1st employee of the company and less than blake salary.
+ SELECT ENAME FROM EMP WHERE HIREDATE > (SELECT MIN(HIREDATE)+(365*4) FROM EMP) AND SAL< (SELECT SAL FROM EMP WHERE ENAME='BLAKE');
+ENAME
+-------
+ADAMS
+63.Display the department information of employee who is working for newyork location.
+ SELECT DNAME, DEPTNO FROM DEPT WHERE LOC ='NEW YORK'
+DNAME              DEPTNO
+-------------- ----------
+ACCOUNTING             10
+64. Display the salary wise employee information for deptno 20 in descending order
+     SELECT * FROM EMP WHERE DEPTNO=20 ORDER BY SAL DESC;
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+                 
+65. Display second employee record
+SELECT * FROM EMP WHERE HIREDATE IN (SELECT MIN(HIREDATE) FROM EMP WHERE HIREDATE > (SELECT MIN(HIREDATE) FROM EMP));
+    EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+--------- ---------- --------- ---------- --------- ---------- ---------- ----------
+     7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+
+
+66.Display location of employees, whose name start with A and salary between 1000 and 3000.
+ SELECT LOC FROM EMP,DEPT WHERE EMP.DEPTNO=DEPT.DEPTNO AND ENAME LIKE 'A%' AND SAL BETWEEN 1000 AND 3000;
+LOC
+-------------
+CHICAGO
+DALLAS
+67.Display department name of all the employees who are reporting to Blake.
+ SELECT DNAME FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP WHERE MGR IN (SELECT EMPNO FROM EMP WHERE ENAME='BLAKE'));
+DNAME
+--------------
+SALES
+68.Display Martin's Manager's Manager's department location
+ SELECT DNAME , LOC FROM DEPT WHERE DEPTNO = (SELECT DEPTNO  FROM EMP  WHERE EMPNO IN (SELECT MGR FROM EMP WHERE EMPNO IN (SELECT MGR
+ FROM EMP WHERE ENAME ='MARTIN')));
+ DNAME          LOC
+-------------- -----------
+ACCOUNTING     NEW YORK
+69. Display the employee name and their salary who joined 2 years before the last person hired.
+SELECT ENAME,SAL FROM EMP WHERE HIREDATE  IN (SELECT MAX(HIREDATE)-(365*2) FROM EMP);
+ENAME             SAL
+---------- ----------
+SMITH             800
+ALLEN            1600
+WARD             1250
+JONES            2975
+MARTIN           1250
+BLAKE            2850
+CLARK            2450
+KING             5000
+TURNER           1500
+JAMES             950
+FORD             3000
+MILLER           1300
+
+
+70. Display the employee name,job and department for those who don't have commission
+  SELECT ENAME,JOB, DNAME,E.DEPTNO FROM EMP E,DEPT D WHERE E.DEPTNO=D.DEPTNO AND E.COMM IS NULL
+  ENAME      JOB       DNAME              DEPTNO
+---------- --------- -------------- ----------
+SMITH      CLERK     RESEARCH               20
+JONES      MANAGER   RESEARCH               20
+BLAKE      MANAGER   SALES                  30
+CLARK      MANAGER   ACCOUNTING             10
+SCOTT      ANALYST   RESEARCH               20
+KING       PRESIDENT ACCOUNTING             10
+ADAMS      CLERK     RESEARCH               20
+JAMES      CLERK     SALES                  30
+FORD       ANALYST   RESEARCH               20
+MILLER     CLERK     ACCOUNTING             10
+71. Display the employee details with their location who earn maximum commission
+ SELECT * FROM EMP,DEPT WHERE EMP.DEPTNO=DEPT.DEPTNO AND COMM IN (SELECT MAX(COMM) FROM EMP);
+ EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO     DEPTNO DNAME   LOC
+------ ---------- --------- ---------- --------- ---------- ---------- ---------- ---------- ------  ---------- 
+
+  7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30         30 SALES     CHICAGO
+ 
+72. Display all the employee whose department is sales and who is earning some commission (i.e commission is not null or zero)and whose
+hired before the last person hired.
+SQL> SELECT * FROM EMP WHERE COMM IS NOT NULL AND HIREDATE <(SELECT MAX(HIREDATE) FROM EMP)
+  2  AND DEPTNO IN(SELECT DEPTNO FROM DEPT WHERE DNAME='SALES');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+73.Display all the department names and manager who is ward's manager's manager.
+SELECT DNAME,MGR FROM EMP E,DEPT D WHERE E.DEPTNO= D.DEPTNO AND EMPNO IN (SELECT MGR FROM EMP W
+HERE EMPNO IN (SELECT MGR FROM EMP WHERE ENAME='WARD'));
+DNAME                 MGR
+-------------- ----------
+ACCOUNTING
+
+74.Display department names and maximum commission of employee's whose salary is greater than average salary of all the clerk's
+SELECT D.DNAME,MAX(E.COMM) FROM EMP E,DEPT D WHERE E.DEPTNO=D.DEPTNO AND E.SAL> ALL(SELECT AVG(SAL) FROM EMP where JOB='ClERK'  GROUP BY JOB  );
+75. Display the last employee record with location.
+ SELECT ENAME,LOC FROM EMP E,DEPT D WHERE E.DEPTNO=D.DEPTNO AND HIREDATE =(SELECT MAX(HIREDATE)
+FROM EMP);
+ENAME      LOC
+---------- -------------
+ADAMS      DALLAS
+76. Display the department number who working in sales department and they are manager.
+ SELECT DEPTNO FROM DEPT WHERE DEPTNO IN(SELECT DEPTNO FROM DEPT WHERE DNAME='SALES') AND  DEPTNO IN
+(SELECT DEPTNO FROM EMP WHERE JOB='MANAGER');
+    DEPTNO
+----------
+        30
+77. Display department name of the employee who earn minmum salary and have reporting manager.
+SELECT DNAME FROM DEPT WHERE DEPTNO IN( SELECT DEPTNO FROM EMP WHERE
+SAL =( SELECT MIN( SAL) FROM EMP WHERE MGR IS NOT NULL))
+DNAME
+--------------
+RESEARCH
+78. Display hiredate and Dname of all the employees working for sales
+ SELECT D.DNAME,E.HIREDATE FROM EMP E, DEPT D WHERE E.DEPTNO=D.DEPTNO AND E.DEPTNO IN (SELECT DEPTNO FROM DEPT WHERE DNAME='SALES')
+DNAME          HIREDATE
+-------------- ---------
+SALES          20-FEB-81
+SALES          22-FEB-81
+SALES          28-SEP-81
+SALES          01-MAY-81
+SALES          08-SEP-81
+SALES          03-DEC-81
+79. Display Location and Dname of employee who is working as president.
+SELECT DNAME,LOC FROM DEPT WHERE DEPTNO=(SELECT DEPTNO FROM EMP WHERE JOB='PRESIDENT');
+DNAME          LOC
+-------------- -------------
+ACCOUNTING     NEW YORK\
+80.Display the Dname of employees whoes salary is maximum salary but lesser than 3000
+SELECT DNAME FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP WHERE SAL IN (SELECT MAX(SAL) FROM EMP WHERE SAL IN(SELECT SAL FROM EMP WHERE SAL<3000)));
+SQL> SELECT DNAME FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP WHERE SAL IN (SELECT MAX(SAL) FR
+OM EMP WHERE SAL< 3000));
+DNAME
+--------------
+RESEARCH
+
+81.Display the department name who are reporting to ADAMS
+SELECT DNAME FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP WHERE MGR IN( SELECT EMPNO FROM
+EMP WHERE ENAME='ADAMS'));
+no rows selected
+82.Display last employee record.
+    SELECT * FROM EMP WHERE HIREDATE IN (SELECT MAX(HIREDATE) FROM EMP);
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+83.Display all the employee whose salary is greater than average salary of department 30.
+ SELECT * FROM EMP WHERE SAL>(SELECT AVG(SAL) FROM EMP WHERE DEPTNO=30);
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+84. Display the number of employees who work for research dept and their salary is lesser than one of the salary in department in 10.
+ SELECT COUNT(*) FROM EMP WHERE DEPTNO IN(SELECT DEPTNO FROM DEPT WHERE DNAME='RESEARCH') AND SAL< ANY(SELECT SAL FROM EMP WHERE DEPTNO=10);
+  COUNT(*)
+----------
+         5
+85.Display the dname that are having clerk in it.
+ SELECT DNAME FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP WHERE JOB='CLERK');
+DNAME
+--------------
+ACCOUNTING
+RESEARCH
+SALES
+86. Display the department names that are having atleast one L in it.
+SELECT DNAME FROM DEPT WHERE DNAME LIKE '%L%';
+DNAME
+--------------
+SALES
+87. Display all the employees who are joined after BLAKE.
+   SELECT * FROM EMP WHERE HIREDATE>(SELECT HIREDATE FROM EMP WHERE ENAME='BLAKE');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+                 
+88. List the dept name that are having at least 3 employees but not more than 5 employees in it.
+ SELECT DNAME FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP GROUP BY DEPTNO HAVING COUNT(*)
+BETWEEN 3 AND 5);
+DNAME
+--------------
+RESEARCH
+ACCOUNTING
+89.Display the location of all employees whose reporting manager salary is greater than 2000.
+SELECT LOC FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP WHERE MGR IN (SELECT EMPNO FROM EMP WHERE SAL >2000))
+LOC
+-------------
+CHICAGO
+DALLAS
+NEW YORK
+90.Select the employees whose dname is having at least two 'E' in it.
+SELECT ENAME, DNAME FROM EMP, DEPT WHERE EMP.DEPTNO = DEPT.DEPTNO AND DNAME LIKE '%E%E%'
+ENAME      DNAME
+---------- -----------
+SMITH      RESEARCH
+JONES      RESEARCH
+SCOTT      RESEARCH
+ADAMS      RESEARCH
+FORD       RESEARCH
+91.Display ename,sal of employees who are earning more than any of the analyst.
+SELECT ENAME,SAL FROM EMP WHERE SAL>ANY(SELECT SAL FROM EMP WHERE JOB='ANALYST');
+ENAME             SAL
+---------- ----------
+KING             5000
+92.  Select all the employees who are working for CHICAGO
+ SELECT * FROM EMP WHERE DEPTNO IN(SELECT DEPTNO FROM DEPT WHERE LOC='CHICAGO');
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+                 
+93. Query to display employee names who is having minimum salary in department research.
+ SELECT * FROM EMP WHERE SAL = ( SELECT MIN (SAL) FROM EMP WHERE DEPTNO=(SELECT DEPTNO FROM DEPT
+ WHERE DNAME='RESEARCH'));
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+                 
+94.List the department names that are having salesman.
+SELECT DNAME FROM DEPT WHERE DEPTNO IN(SELECT DEPTNO FROM EMP WHERE JOB='SALESMAN');
+DNAME
+--------------
+SALES
+95. List the department names that are having at least 3 employes in it.
+SELECT DNAME FROM DEPT WHERE DEPTNO IN (SELECT DEPTNO FROM EMP GROUP BY DEPTNO HAVING COUNT(*)>=3);
+DNAME
+--------------
+SALES
+RESEARCH
+ACCOUNTING
+96.List employees from research and accounting department having atleast two reporting.
+ SELECT ENAME FROM EMP WHERE DEPTNO IN(SELECT DEPTNO FROM DEPT WHERE DNAME IN('ACCOUNTING','RESEARCH')) AND
+ EMPNO IN(SELECT MGR FROM EMP GROUP BY MGR HAVING COUNT(*)>=2)
+ENAME
+----------
+KING
+JONES
+
+97. Write a query to display employee name, job,dname,location of all employees who are working as manager and works at Chicago.
+SELECT ENAME,JOB,LOC FROM EMP E,DEPT D WHERE E.DEPTNO=D.DEPTNO AND JOB='MANAGER'AND LOC='CHICAGO';
+ENAME      JOB       LOC
+---------- --------- -------------
+BLAKE      MANAGER   CHICAGO
+98. Select ename,dname of employee who earns 2nd max salary and works for location Dallas.
+ SELECT ENAME,DNAME FROM EMP E,DEPT D WHERE E.DEPTNO=D.DEPTNO AND E.SAL IN(SELECT MAX(SAL) FROM EMP WHERE SAL<(SELECT MAX(SAL) FROM EMP)
+ AND LOC='DALLAS'
+
+ENAME      DNAME
+---------- --------------
+SCOTT      RESEARCH
+FORD       RESEARCH
+
+
+99. Write a query to display the employee information who is not taking commission and joined company after July 83
+ SELECT * FROM EMP WHERE COMM IS NULL AND HIREDATE > '31-JULY-83';
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+                 
+100. List employees from sales and research department having atleast 2 reporting employees
+SELECT ENAME FROM EMP WHERE DEPTNO IN(SELECT DEPTNO FROM DEPT WHERE DNAME IN('SALES','RESEARCH'))
+AND EMPNO IN(SELECT MGR FROM EMP GROUP BY MGR HAVING COUNT(*)>=2);
+ENAME
+----------
+BLAKE
+JONES
+
+From <http://abclst.blogspot.com/2017/01/sub-queries-with-answer.html> 
