@@ -1,0 +1,264 @@
+1.delete duplicates from employee
+
+1. select employee_id, name, salary, count(*) from employee group by employee_id, name, salary;
+2. Select distinct * from employee;
+3. SELECT employee_id, name, salary FROM employee GROUP BY employee_id, name, salary having(count(employee_id)> 1) );
+ 
+ 
+2. write query with all type of joins dept,emp
+
+select * from departments d join employee e on d.dept_id=e.dept_id;
+
+ select * from departments d left outer join employee e on d.dept_id=e.dept_id;
+
+ select * from departments d right outer join employee e on d.dept_id=e.dept_id;
+
+ select * from departments d full join employee e on d.dept_id=e.dept_id;
+
+
+3. How to find the employee with second MAX Salary
+
+1.select salary, name from employee where salary =(select max(salary) from employee where salary < (select max(salary) from employee) );
+2.   select * from(
+select * ,dense_rank() 
+over(order by salary desc) R from Employee) 
+where R=2;
+------------------------------------------------------------------------------------------------------------------------------------------
+1. Create emplyoee table with below columns
+
+employee_id
+first_name
+last_name
+email
+phone_number
+hire_date
+job_id
+salary
+manager_id
+department_id
+
+Ans: 
+create or replace table employee(
+employee_id int,
+first_name varchar(20),
+last_name varchar(20),
+email varchar(20),
+phone_number int,
+hire_date date,
+job_id int,
+salary number,
+manager_id int,
+department_id int
+);
+
+
+insert into employee values(1001,'anusha','sharma','mmm@gmail.com','8282882882','1998-01-23',100,45000,8,10);
+insert into employee values(1002,'radha','patil','bbb@gmail.com','329082728','1994-04-25',101,25000,7,20);
+insert into employee values(1003,'sai','ram','www@gmail.com','12345098','2006-09-21',102,45000,4,40);
+insert into employee values(1004,'archana','sharma','abcd@gmail.com','123454321','2003-06-24',103,45000,5,10);
+insert into employee values(1005,'aryan','khan','aaaa@gmail.com','123456789','1993-05-05',104,39484.00,4,20);
+insert into employee values(1006,'disha','xyz','ddd@gmail.com','4444444444','2009-04-14',105,45000,3,30);
+insert into employee values(1007,'kriti', 'kumar','kkk@gmail.com','7666666666','1992-05-29',106,45000,2,10);
+
+find employee and manager name
+
+
+2. Calculate total sum of salary department wise
+select department_id,sum(salary) from employee group by department_id;
+
+3. Calculate cumulative sum of salary department wise;
+select *, sum(salary) over (order by department_id) as CUM_SALARY
+from employee;
+
+4. Calculate Cumulative average of the salary department wise
+
+select *, avg(salary) over (order by department_id) as CUM_AVGSALARY
+from employee;
+
+5. What is CTE
+Common table expression (CTE) is a temporary named result set that you can reference within a SELECT, INSERT, UPDATE, or DELETE statement
+syntax:
+
+with
+    my_cte (cte_col_1, cte_col_2) as (   -- begin CTE
+        select col_1, col_2
+            from ...
+    )                                    -- end CTE
+
+select ... from my_cte;
+
+6. Difference between DML,DDL,DQL,DCL
+DDL (Data Definition Language)-ALTER,SHOW FUNCTIONS, SHOW PARAMETERS,SHOW VARIABLES,SET, UNSET , USE { DATABASE | ROLE | SCHEMA | WAREHOUSE }
+
+DML- DELETE , INSERT , MERGE , REPLACE , UPDATE,GET , LIST , PUT , REMOVE,COPY INTO { <table> | <location> }
+
+DCL- COMMIT, ROLLBACK, SAVEPOINT
+
+DQL- SELECT
+
+7. Difference between rank and dense_rank
+
+Main Differences Between RANK and DENSE_RANK 
+RANK is a function provided in the SQL language that helps the programmer in categorizing a different set of data, but dense rank is another function that does a similar job but without skipping any number. 
+The purpose of ranking is to analyze the given rank of each and every room, while the purpose of dense ranking is to analyze the ranks of a particular column only. 
+Rank is written as RANK () while dense rank is written as DENSE_RANK (). 
+------------------------------------------------------------------------------------------------------------------------------------------
+1. Delete records using 'USING' clause
+The USING clause specifies which columns to test for equality when two tables are joined.
+It can be used instead of an ON clause in the JOIN operations that have an explicit join clause.
+
+delete from employee1 e1 using employee1 e2
+where e2.employee_id =e1.EMPLOYEE_ID and e1.department_id=10; 
+
+2. How can we retrieve alternate records from a table?
+To fetch even Numbered row:
+SELECT * FROM table_name WHERE column_name % 2 = 0
+To fetch odd Numbered row:
+SELECT * FROM table_name WHERE column_name % 2 = 1
+
+or 
+
+
+3. Query to find records in Table A not in Table B without using NOT IN.
+	Table_A
+	10
+	20
+	30
+
+	Table_B
+	15
+	30
+	45
+
+SELECT * FROM table_1
+minus
+SELECT * FROM table_2;
+
+4.What are the differences between CASE and DECODE in SQL?
+Decode Statement is faster than Case Statement when it passes from optimizer.
+CASE: is a statement while decode is a function
+decode performs an equality check 
+CASE can perform logical comparisions such as <,>, BETWEEN,LIKE
+CASE: can work in pl/sql but decode cannot
+
+CASE example:select EMPLOYEE_NAME
+         , case
+           when SALARY < 30000
+                  then 'Grade I'
+             when (SALARY >=1000 and SALARY < 2000)
+                  then 'Grade II'
+             when (SALARY >= 2000 and SALARY < 3000)
+                  then 'Grade III'
+             else 'Grade IV'
+          end sal_grade
+   from EMPLOYEE
+
+DECODE: SQL> select *
+        , decode (DEPARTMENT_ID, 10, 'Accounting',
+                           20, 'Research',
+                           30, 'Sales',
+                               'Unknown') as DEPARTMENT
+    from   EMPLOYEE;
+
+
+5.What is the difference between UNION and UNION ALL?
+Union: 		Combines distinct results of two or more SELECT statements.
+Union All:	Combines all results of two or more SELECT statements, including duplicates.
+Intersect:	Returns only the common records obtained from two or more SELECT statements.
+Minus:		Returns only those records which are exclusive to the first table.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+1. Retrieve the details (Name, Salary and dept code) of the employees who are 
+working in department 20, 30 and 40.
+ans:   SELECT * FROM EMP WHERE DEPTNO IN(20,30,40); 
+
+2. Display the code, subjects and total marks for every student. Total Marks will be 
+calculated as Subject1+Subject2+Subject3. (Refer Student_Marks table)
+ANS:
+SELECT STUDENT_CODE,SUM(SUBJECT1+SUBJECT2+SUBJECT3) TOTAL FROM STUDENT_MARKS GROUP BY STUDENT_CODE;
+
+
+3. List the details of the staff whose designations are either PROFESSOR or 
+LECTURER. 
+SELECT * FROM DESIGNATION_MASTERS D JOIN STAFF_MASTERS S 
+ON D.DESIGN_CODE=S.DESIGN_CODE 
+WHERE D.DESIGN_NAME = 'PROFESSOR' OR  D.DESIGN_NAME = 'LECTURER';
+
+
+4.  List the name and Designations of the staff who have joined before Jan 2003.
+
+SELECT * FROM DESIGNATION_MASTERS D JOIN STAFF_MASTERS S 
+ON D.DESIGN_CODE=S.DESIGN_CODE WHERE HIREDATE<'01-JAN-2003';
+
+
+5. List the name and experience (in years) of employees who are working as 
+LECTURER.
+
+SELECT STAFF_NAME, STAFF_CODE,DATEDIFF(YEAR,HIREDATE::DATE,CURRENT_DATE()::DATE) EXPERIENCE FROM DESIGNATION_MASTERS D JOIN STAFF_MASTERS S 
+ON D.DESIGN_CODE=S.DESIGN_CODE WHERE D.DESIGN_NAME= 'PROFESSOR';
+
+6. List the Name and Salary of the staff who are earning between 12000 and 25000. 
+Sort them based on their salaries and name. 
+
+SELECT STAFF_NAME, STAFF_SAL FROM STAFF_MASTERS WHERE STAFF_SAL BETWEEN 12000 AND 25000 ORDER BY STAFF_SAL, NAME;
+
+7.  Display employees who do not have manager. 
+SELECT * FROM DESIGNATION_MASTERS D LEFT JOIN STAFF_MASTERS S 
+ON D.DESIGN_CODE=S.DESIGN_CODE 
+WHERE S.MGR_CODE= NULL;
+
+8. Write a query which will display name, department code and date of birth of all 
+students who were born between January 1, 1981 and March 31, 1983. Sort it based 
+on date of birth (ascending).
+ans; 
+ SELECT STAFF_NAME, DESIGN_CODE,STAFF_DOB FROM STAFF_MASTERS WHERE STAFF_DOB 
+ BETWEEN '1981-01-01'::DATE TO '1983-03-31'::DATE ORDER BY STAFF_DOB;
+
+>> SELECT STUDENT_CODE,STUDENT_NAME,DEPT_CODE,STUDENT_DOB FROM STUDENT_MASTERS ORDER BY STUDENT_DOB;
+
+9. List the details of the employees, whose names start with ‘A’ and end with ‘S’.
+
+ANS: SELECT * FROM EMP WHERE ENAME LIKE 'A%' OR ENAME LIKE 'S%';
+
+
+10. List the name and job of the employees whose names should contain N as the 
+second or third character, and ending with either ‘N’ or ‘S’.
+ANS:
+SELECT ENAME, JOB FROM EMP WHERE ENAME LIKE '%N%' AND ENAME LIKE '%N' OR ENAME LIKE '%S';
+
+11.  List the details of the employees who have joined in December (irrespective of the 
+year).
+ANS: SELECT * FROM EMP WHERE TO_CHAR(HIREDATE, 'MON')= 'DEC';
+
+12. Write a query to display number of people in each Department. Output should 
+display Department Code, Department Name and Number of People.
+Ans:
+SELECT DEPTNO, DEPT_NAME, COUNT(EMPNO) NO_OF_EMP FROM EMP E JOIN DEPARTMENT_MASTERS D 
+ON E.DEPTNO=D.DEPT_CODE GROUP BY DEPTNO, DEPT_NAME;
+
+13.  Determine the number of managers without listing them. Label the column as 
+‘Total Number of Managers’.
+ANS:
+SELECT COUNT(MGR) AS "TOTAL_NUMBER_OF_MANAGERS"  FROM EMP ;
+
+14. Display the Highest, Lowest, Total & Average salary of all staff. Label the columns 
+Maximum, Minimum, Total and Average respectively. Round the result to nearest 
+whole number.
+ANS:
+SELECT ROUND(AVG(STAFF_SAL)) AVERAGE_SAL ,
+ROUND(MAX(STAFF_SAL)) MAXIMUM_SAL, 
+ROUND(MIN(STAFF_SAL)) MINIMUM_SAL,
+ROUND(SUM(STAFF_SAL)) TOTAL_SAL
+FROM STAFF_MASTERS;
+
+
+15. Display the staff name, hire date and day of the week on which the staff joined. 
+Order the results by the day of the week starting with Monday. 
+
+ANS:
+SELECT STAFF_NAME, HIREDATE,DAYNAME(HIREDATE)
+FROM STAFF_MASTERS ORDER BY (NEXT_DAY(HIREDATE, 'MONDAY') - HIREDATE) DESC ;
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+
